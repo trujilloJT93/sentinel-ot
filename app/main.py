@@ -1,5 +1,6 @@
 ﻿from fastapi import FastAPI
 from app.api.devices import router as devices_router
+from app.api.alerts import router as alerts_router
 
 app = FastAPI(
     title="Sentinel OT API",
@@ -9,6 +10,7 @@ app = FastAPI(
 
 # Incluir los routers
 app.include_router(devices_router)
+app.include_router(alerts_router)
 
 @app.get("/", tags=["Health"])
 async def root():
