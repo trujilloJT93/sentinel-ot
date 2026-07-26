@@ -1,10 +1,14 @@
-from fastapi import FastAPI
+ï»¿from fastapi import FastAPI
+from app.api.devices import router as devices_router
 
 app = FastAPI(
     title="Sentinel OT API",
-    description="API para monitoreo, supervisión y seguridad en redes de Tecnología Operativa (OT).",
+    description="API para monitoreo, supervision y seguridad en redes de Tecnologia Operativa (OT).",
     version="0.1.0"
 )
+
+# Incluir los routers
+app.include_router(devices_router)
 
 @app.get("/", tags=["Health"])
 async def root():
