@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -180,20 +180,20 @@
                 document.getElementById("totalDevices").innerText = devices.length;
                 
                 const devTbody = document.getElementById("devicesTable");
-                devTbody.innerHTML = devices.map(d => 
+                devTbody.innerHTML = devices.map(d => `
                     <tr class="hover:bg-slate-800/50">
-                        <td class="py-3 px-4 text-slate-400">#</td>
-                        <td class="py-3 px-4 font-medium text-white"></td>
-                        <td class="py-3 px-4 font-mono text-emerald-300"></td>
-                        <td class="py-3 px-4"><span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs"></span></td>
-                        <td class="py-3 px-4 text-slate-400"></td>
+                        <td class="py-3 px-4 text-slate-400">#${d.id ?? ''}</td>
+                        <td class="py-3 px-4 font-medium text-white">${d.name ?? d.nombre ?? 'Sin Nombre'}</td>
+                        <td class="py-3 px-4 font-mono text-emerald-300">${d.ip_address ?? d.ip ?? '-'}</td>
+                        <td class="py-3 px-4"><span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs">${d.protocol ?? d.protocolo ?? 'N/A'}</span></td>
+                        <td class="py-3 px-4 text-slate-400">${d.location ?? d.ubicacion ?? 'N/A'}</td>
                         <td class="py-3 px-4">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ">
-                                
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${ (d.status ?? d.estado) === 'OK' || (d.status ?? d.estado) === 'ONLINE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">
+                                ${d.status ?? d.estado ?? 'DESCONOCIDO'}
                             </span>
                         </td>
                     </tr>
-                ).join("");
+                `).join("");
 
                 // Alertas
                 const resAlt = await fetch("/api/v1/alerts");
@@ -204,16 +204,16 @@
                 if (alerts.length === 0) {
                     altDiv.innerHTML = '<p class="text-slate-500 text-sm">No hay alertas registradas.</p>';
                 } else {
-                    altDiv.innerHTML = alerts.map(a => 
+                    altDiv.innerHTML = alerts.map(a => `
                         <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg flex justify-between items-center">
                             <div>
-                                <span class="text-xs font-bold px-2 py-0.5 rounded "></span>
-                                <h4 class="font-semibold text-white mt-1"></h4>
-                                <p class="text-slate-400 text-xs"> - IP Origen: </p>
+                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">${a.severity ?? a.severidad ?? 'ALERTA'}</span>
+                                <h4 class="font-semibold text-white mt-1">${a.message ?? a.mensaje ?? 'Alerta detectada'}</h4>
+                                <p class="text-slate-400 text-xs">IP Origen: ${a.source_ip ?? a.ip_origen ?? 'N/A'}</p>
                             </div>
-                            <span class="text-xs text-slate-500"></span>
+                            <span class="text-xs text-slate-500">${a.timestamp ?? a.fecha ?? ''}</span>
                         </div>
-                    ).join("");
+                    `).join("");
                 }
 
             } catch (err) {
