@@ -2,18 +2,29 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.database import engine, Base, SessionLocal
-from app.db_models import DeviceDB
+from app.db_models import DeviceDB, UserDB
 from app.models.device import ProtocolType, DeviceStatus
+from app.core.security import get_password_hash
 from app.api.devices import router as devices_router
 from app.api.alerts import router as alerts_router
+from app.api.auth import router as auth_router
 from app.services.collector import collector_service
 
-# Crear las tablas en la base de datos si no existen
 Base.metadata.create_all(bind=engine)
 
 def seed_data():
-    """Insertar datos de prueba iniciales si la BD esta vacia"""
     db = SessionLocal()
+    # Usuario por defecto: admin / admin123
+    if db.query(UserDB).count() == 0:
+        admin_user = UserDB(
+            username="admin",
+            email="admin@sentinel.ot",
+            hashed_password=get_password_hash("admin123")
+        )
+        db.add(admin_user)
+        db.commit()
+        print("👤 [Database] Usuario 'admin' (password: admin123) creado por defecto.")
+
     if db.query(DeviceDB).count() == 0:
         initial_devices = [
             DeviceDB(
@@ -35,7 +46,7 @@ def seed_data():
         ]
         db.add_all(initial_devices)
         db.commit()
-        print("🌱 [Database] Datos semilla de dispositivos creados.")
+        print("🌱 [Database] Datos semilla creados.")
     db.close()
 
 @asynccontextmanager
@@ -53,6 +64,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+app.include_router(auth_router)
 app.include_router(devices_router)
 app.include_router(alerts_router)
 

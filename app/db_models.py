@@ -1,8 +1,17 @@
-﻿from sqlalchemy import Column, Integer, String, Enum as SQLEnum, DateTime, ForeignKey
+﻿from sqlalchemy import Column, Integer, String, Boolean, Enum as SQLEnum, DateTime, ForeignKey
 from datetime import datetime
 from app.database import Base
 from app.models.device import ProtocolType, DeviceStatus
 from app.models.alert import SeverityLevel, AlertStatus
+
+class UserDB(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, nullable=True)
+    hashed_password = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
 
 class DeviceDB(Base):
     __tablename__ = "devices"
