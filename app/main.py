@@ -1,6 +1,7 @@
 ﻿import asyncio
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
 from app.database import engine, Base, SessionLocal
 from app.db_models import DeviceDB, UserDB
 from app.models.device import ProtocolType, DeviceStatus
@@ -12,9 +13,10 @@ from app.services.collector import collector_service
 
 Base.metadata.create_all(bind=engine)
 
+templates = Jinja2Templates(directory="app/templates")
+
 def seed_data():
     db = SessionLocal()
-    # Usuario por defecto: admin / admin123
     if db.query(UserDB).count() == 0:
         admin_user = UserDB(
             username="admin",
@@ -68,9 +70,9 @@ app.include_router(auth_router)
 app.include_router(devices_router)
 app.include_router(alerts_router)
 
-@app.get("/", tags=["Health"])
-async def root():
-    return {"status": "online", "system": "Sentinel OT Core", "version": "0.1.0"}
+@app.get("/", tags=["Dashboard"])
+async def render_dashboard(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/api/v1/health", tags=["Health"])
 async def health_check():

@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel OT - Monitor Industrial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Header -->
+    <header class="card border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-shield-halved text-emerald-400 text-2xl"></i>
+            <h1 class="text-xl font-bold tracking-wider text-slate-100">SENTINEL <span class="text-emerald-400">OT</span></h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span id="authStatus" class="text-sm text-slate-400"><i class="fa-solid fa-user-lock mr-1"></i> Modo Lectura</span>
+            <button id="loginBtn" onclick="toggleLoginModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition">
+                Iniciar Sesión
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        
+        <!-- Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="card p-5 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-sm">Dispositivos Totales</p>
+                    <p id="totalDevices" class="text-3xl font-bold text-white mt-1">0</p>
+                </div>
+                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
+                    <i class="fa-solid fa-network-wired text-2xl"></i>
+                </div>
+            </div>
+            
+            <div class="card p-5 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-sm">Estado de Red</p>
+                    <p id="networkHealth" class="text-3xl font-bold text-emerald-400 mt-1">Óptimo</p>
+                </div>
+                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                    <i class="fa-solid fa-heart-pulse text-2xl"></i>
+                </div>
+            </div>
+
+            <div class="card p-5 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-sm">Alertas Activas</p>
+                    <p id="totalAlerts" class="text-3xl font-bold text-amber-400 mt-1">0</p>
+                </div>
+                <div class="p-3 bg-amber-500/10 text-amber-400 rounded-lg">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Devices Section -->
+        <div class="card rounded-xl p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-slate-200"><i class="fa-solid fa-server text-emerald-400 mr-2"></i>Activos Industriales (OT)</h2>
+                <button onclick="fetchData()" class="text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-rotate-right mr-1"></i> Actualizar</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-700 text-slate-400 text-sm">
+                            <th class="py-3 px-4">ID</th>
+                            <th class="py-3 px-4">Nombre</th>
+                            <th class="py-3 px-4">Dirección IP</th>
+                            <th class="py-3 px-4">Protocolo</th>
+                            <th class="py-3 px-4">Ubicación</th>
+                            <th class="py-3 px-4">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devicesTable" class="divide-y divide-slate-800 text-sm">
+                        <!-- Carga dinámica -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Security Alerts Section -->
+        <div class="card rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-slate-200 mb-4"><i class="fa-solid fa-shield-virus text-amber-400 mr-2"></i>Alertas de Ciberseguridad</h2>
+            <div id="alertsList" class="space-y-3">
+                <!-- Carga dinámica -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Login -->
+    <div id="loginModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4">
+        <div class="card p-6 rounded-xl w-full max-w-md space-y-4">
+            <h3 class="text-xl font-bold text-white">Iniciar Sesión</h3>
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Usuario</label>
+                <input type="text" id="loginUsername" value="admin" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+            </div>
+            <div>
+                <label class="block text-sm text-slate-400 mb-1">Contraseña</label>
+                <input type="password" id="loginPassword" value="admin123" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+            </div>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="toggleLoginModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm text-white">Cancelar</button>
+                <button onclick="performLogin()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded text-sm text-white font-medium">Ingresar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Cliente -->
+    <script>
+        let token = localStorage.getItem("token") || null;
+
+        function updateAuthUI() {
+            const authStatus = document.getElementById("authStatus");
+            const loginBtn = document.getElementById("loginBtn");
+            if (token) {
+                authStatus.innerHTML = '<i class="fa-solid fa-user-check text-emerald-400 mr-1"></i> Sesión Activa';
+                loginBtn.innerText = "Cerrar Sesión";
+                loginBtn.onclick = logout;
+            } else {
+                authStatus.innerHTML = '<i class="fa-solid fa-user-lock mr-1"></i> Modo Lectura';
+                loginBtn.innerText = "Iniciar Sesión";
+                loginBtn.onclick = toggleLoginModal;
+            }
+        }
+
+        function toggleLoginModal() {
+            document.getElementById("loginModal").classList.toggle("hidden");
+            document.getElementById("loginModal").classList.toggle("flex");
+        }
+
+        async function performLogin() {
+            const user = document.getElementById("loginUsername").value;
+            const pass = document.getElementById("loginPassword").value;
+
+            const body = new URLSearchParams();
+            body.append("username", user);
+            body.append("password", pass);
+
+            try {
+                const res = await fetch("/api/v1/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: body
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    token = data.access_token;
+                    localStorage.setItem("token", token);
+                    toggleLoginModal();
+                    updateAuthUI();
+                } else {
+                    alert("Credenciales incorrectas");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function logout() {
+            token = null;
+            localStorage.removeItem("token");
+            updateAuthUI();
+        }
+
+        async function fetchData() {
+            try {
+                // Dispositivos
+                const resDev = await fetch("/api/v1/devices");
+                const devices = await resDev.json();
+                document.getElementById("totalDevices").innerText = devices.length;
+                
+                const devTbody = document.getElementById("devicesTable");
+                devTbody.innerHTML = devices.map(d => 
+                    <tr class="hover:bg-slate-800/50">
+                        <td class="py-3 px-4 text-slate-400">#</td>
+                        <td class="py-3 px-4 font-medium text-white"></td>
+                        <td class="py-3 px-4 font-mono text-emerald-300"></td>
+                        <td class="py-3 px-4"><span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs"></span></td>
+                        <td class="py-3 px-4 text-slate-400"></td>
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ">
+                                
+                            </span>
+                        </td>
+                    </tr>
+                ).join("");
+
+                // Alertas
+                const resAlt = await fetch("/api/v1/alerts");
+                const alerts = await resAlt.json();
+                document.getElementById("totalAlerts").innerText = alerts.length;
+
+                const altDiv = document.getElementById("alertsList");
+                if (alerts.length === 0) {
+                    altDiv.innerHTML = '<p class="text-slate-500 text-sm">No hay alertas registradas.</p>';
+                } else {
+                    altDiv.innerHTML = alerts.map(a => 
+                        <div class="p-4 bg-slate-900 border border-slate-800 rounded-lg flex justify-between items-center">
+                            <div>
+                                <span class="text-xs font-bold px-2 py-0.5 rounded "></span>
+                                <h4 class="font-semibold text-white mt-1"></h4>
+                                <p class="text-slate-400 text-xs"> - IP Origen: </p>
+                            </div>
+                            <span class="text-xs text-slate-500"></span>
+                        </div>
+                    ).join("");
+                }
+
+            } catch (err) {
+                console.error("Error al cargar datos:", err);
+            }
+        }
+
+        updateAuthUI();
+        fetchData();
+        setInterval(fetchData, 4000); // Poll cada 4 segundos
+    </script>
+</body>
+</html>
