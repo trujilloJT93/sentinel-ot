@@ -1,24 +1,27 @@
-# Sentinel OT
+# 🏭 SentinelOT Engine
 
-Sistema de monitoreo, seguridad y supervisi�n para entornos de Tecnolog�a Operativa (OT).
+> Sistema de monitoreo, seguridad y supervisión para entornos de Tecnología Operativa (OT / SCADA / ICS).
 
-## ?? Descripci�n
-**Sentinel OT** est� dise�ado para brindar visibilidad, an�lisis y control en tiempo real sobre redes y dispositivos industriales / OT.
+---
 
-## ??? Tecnolog�as utilizadas
-* *Por definir (ej. Python, Node.js, Docker, C++)*
+## 📌 Descripción
+**SentinelOT** es una plataforma de ciberdefensa diseñada para brindar visibilidad, análisis y control en tiempo real sobre redes y dispositivos industriales (OT/ICS). Incorpora simulación de telemetría asíncrona, detección proactiva de anomalías, autenticación JWT con RBAC y exportación de reportes de auditoría en CSV para cumplimiento normativo (GRC).
 
-## ?? Instalaci�n y Configuraci�n
-\\\ash
-# Clonar el repositorio
-git clone https://github.com/trujilloJT93/sentinel-ot.git
+---
 
-# Entrar al directorio
+## 🛠️ Tecnologías Utilizadas
+
+* **Lenguaje:** Python 3.10+
+* **Framework Web:** FastAPI / Uvicorn
+* **ORM & DB:** SQLAlchemy / SQLite
+* **Seguridad:** JWT (JSON Web Tokens), Passlib (Bcrypt)
+* **Arquitectura:** Asíncrona (Asyncio), REST API
+
+---
+
+## 🚀 Instalación y Configuración
+
+### 1. Clonar el repositorio
+```bash
+git clone [https://github.com/trujilloJT93/sentinel-ot.git](https://github.com/trujilloJT93/sentinel-ot.git)
 cd sentinel-ot
-\\\
-
-## ?? Uso
-*(Instrucciones para ejecutar el proyecto)*
-
-## ?? Licencia
-Este proyecto est� bajo la Licencia MIT - mira el archivo [LICENSE](LICENSE) para detalles.
